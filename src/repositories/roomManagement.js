@@ -1,21 +1,25 @@
-let rooms = [];
+const { Person, ROLES } = require('../models/Person');
+const { Room } = require('../models/Room');
 
+let rooms = [];
 let id = 1;
 
 const getRooms = () => rooms;
 
 const createRoom = (socketId, name) => {
-    const room = {
+    const person = Person({
+        socketId,
+        name,
+        roles: [
+            ROLES.ADMIN,
+            ROLES.PARTICIPANT,
+        ],
+    });
+    const room = Room({
         id,
-        people: [{
-            socketId,
-            name,
-            roles: [
-                'admin',
-                'participant',
-            ]
-        }],
-    };
+        people: [person],
+        cardsAreVisible: true,
+    });
     id++;
 
     rooms.push(room);
@@ -28,7 +32,8 @@ const joinRoom = (socketId, roomId, name) => {
         const storedRoomId = rooms.findIndex(({ id }) => id === roomId);
         if (storedRoomId === -1) throw new Error('Room not found');
 
-        rooms[storedRoomId].people.push({ socketId, name, roles: ['participant'] });
+        const person = Person({ socketId, name, roles: [ROLES.PARTICIPANT] });
+        rooms[storedRoomId].people.push(person);
 
         return rooms[storedRoomId];
     } catch (err) {
