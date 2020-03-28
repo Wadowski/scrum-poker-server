@@ -2,13 +2,18 @@ const EVENTS_RECEIVED = {
     CONNECTION: 'connection',
     CREATE_ROOM: 'create room',
     JOIN_ROOM: 'join room',
+    LEAVE_ROOM: 'leave room',
     DISCONNECT: 'disconnect',
+    CARD_CHOSEN: 'card chosen',
+    HIDE_CARDS: 'hide cards',
+    SHOW_CARDS: 'show cards',
 };
 
 const EVENT_SEND = {
     ROOM_JOINED: 'room joined successfully',
     ROOM_NOT_JOINED: 'room not joined successfully',
     ROOM_PEOPLE_UPDATE: 'room people update',
+    CARDS_UPDATE: 'cards update',
 };
 
 module.exports = {
