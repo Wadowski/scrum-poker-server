@@ -47,7 +47,6 @@ const leaveRoomHandler = (socket, io) => (roomId) => {
         const room = leaveRoom(socket.id, Number(roomId));
         socket.leave(`${roomId}`);
 
-        console.log(mapRoom(room).people);
         io.emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
     } catch (err) {
         console.log(err);
@@ -69,7 +68,6 @@ const cardsChosenHandler = (socket, io) => (roomId, value) => {
 
         const room = updateCardValue(socketId, Number(roomId), value);
 
-        console.log(room);
         io.emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
     } catch (err) {
         console.log(err);
