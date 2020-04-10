@@ -107,7 +107,6 @@ const showCardsHandler = (socket, io) => (roomId) => {
 
 const updateUserDetailsHandler = (socket, io) => (roomId, userDetails) => {
     try {
-        console.log(({roomId, userDetails}));
         const user = updateUserDetails(socket.id, roomId, userDetails);
 
         socket.emit(EVENT_SEND.USER_DETAILS_UPDATE, user);

@@ -113,10 +113,8 @@ const updateUserDetails = (socketId, roomId, details) => {
     let user = null;
     rooms[storedRoomId].people.forEach((person) => {
         if (person.socketId === socketId) {
-            person = {
-                ...person,
-                ...details,
-            };
+            if(details.name) person.name = details.name;
+            if(details.roles) person.roles = details.roles;
             user = person;
         }
     });
