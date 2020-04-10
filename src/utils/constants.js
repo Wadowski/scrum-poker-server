@@ -8,6 +8,7 @@ const EVENTS_RECEIVED = {
     HIDE_CARDS: 'hide cards',
     SHOW_CARDS: 'show cards',
     UPDATE_USER_DETAILS: 'update user details',
+    TEST: 'test',
 };
 
 const EVENT_SEND = {
@@ -18,6 +19,7 @@ const EVENT_SEND = {
     ROOM_UPDATE: 'room update',
     VOTE_STATUS_UPDATE: 'vote status update',
     USER_DETAILS_UPDATE: 'user details update',
+    TEST: 'test',
 };
 
 module.exports = {

@@ -116,6 +116,10 @@ const updateUserDetailsHandler = (socket, io) => (roomId, userDetails) => {
     }
 };
 
+const pingHandler = (socket) => () => {
+    socket.emit(EVENT_SEND.TEST);
+};
+
 module.exports = {
     createRoomHandler,
     joinRoomHandler,
@@ -125,4 +129,5 @@ module.exports = {
     hideCardsHandler,
     showCardsHandler,
     updateUserDetailsHandler,
+    pingHandler,
 };
