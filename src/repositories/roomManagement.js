@@ -1,5 +1,6 @@
 const { Person, ROLES } = require('../models/Person');
 const { Room } = require('../models/Room');
+const { Card } = require('../models/Card');
 
 let rooms = [];
 let id = 1;
@@ -24,6 +25,7 @@ const createRoom = (socketId, name) => {
         id,
         people: [person],
         cardsAreVisible: true,
+        voteStarted: false,
     });
     id++;
 
@@ -71,13 +73,29 @@ const removePersonFromRooms = (socketId) => {
     return roomsJoined;
 };
 
-const updateCardValue = (socketId, roomId, cardValue) => {
+const updateCardValue = (socketId, roomId, card) => {
     const storedRoomId = getRoomListIndex(roomId);
 
     rooms[storedRoomId].people.forEach((person) => {
         if (person.socketId === socketId) {
-            person.cardValue = cardValue;
+            person.card = Card({
+                position: card.position || null,
+                value: card.value,
+            });
         }
+    });
+
+    return rooms[storedRoomId];
+};
+
+const updateAllCardsValue = (roomId, card) => {
+    const storedRoomId = getRoomListIndex(roomId);
+
+    rooms[storedRoomId].people.forEach((person) => {
+        person.card = Card({
+            position: card.position || null,
+            value: card.value,
+        });
     });
 
     return rooms[storedRoomId];
@@ -91,11 +109,21 @@ const toggleCardsVisibility = (roomId, visibilityStatus) => {
     return rooms[storedRoomId];
 };
 
+const toggleVoteStarted = (roomId, voteStarted) => {
+    const storedRoomId = getRoomListIndex(roomId);
+
+    rooms[storedRoomId].voteStarted = voteStarted;
+
+    return rooms[storedRoomId];
+};
+
 module.exports = {
     createRoom,
     removePersonFromRooms,
     joinRoom,
     leaveRoom,
     updateCardValue,
+    updateAllCardsValue,
     toggleCardsVisibility,
+    toggleVoteStarted,
 };

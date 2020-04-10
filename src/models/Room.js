@@ -1,7 +1,8 @@
-const Room = ({ id, people, cardsAreVisible }) => ({
+const Room = ({ id, people, cardsAreVisible, voteStarted }) => ({
     id,
     people,
     cardsAreVisible,
+    voteStarted,
 });
 
 module.exports = {

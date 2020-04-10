@@ -4,14 +4,16 @@ const {
     leaveRoom,
     removePersonFromRooms,
     updateCardValue,
+    updateAllCardsValue,
     toggleCardsVisibility,
+    toggleVoteStarted,
 } = require('../repositories/roomManagement');
 const { EVENT_SEND } = require('../utils/constants');
 
 const mapRoom = (room) => ({
     people: room.people.map((person) => ({
         ...person,
-        cardValue: room.cardsAreVisible ? person.cardValue : '?',
+        card: room.cardsAreVisible ? person.card : { value: '?' },
     })),
 });
 
@@ -19,8 +21,9 @@ const createRoomHandler = (socket, io) => (name) => {
     try {
         const room = createRoom(socket.id, name);
         socket.join(`${room.id}`);
-        socket.emit(EVENT_SEND.ROOM_JOINED, room.id, );
-        io.emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
+        socket.emit(EVENT_SEND.ROOM_JOINED, room.id );
+        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_UPDATE, room);
+        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
     } catch (err) {
         socket.emit(EVENT_SEND.ROOM_NOT_JOINED);
         console.log(err);
@@ -34,7 +37,8 @@ const joinRoomHandler = (socket, io) => (roomId, name) => {
         socket.join(`${roomId}`);
 
         socket.emit(EVENT_SEND.ROOM_JOINED, roomId);
-        io.emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
+        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_UPDATE, room);
+        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
     } catch (err) {
         socket.emit(EVENT_SEND.ROOM_NOT_JOINED);
         console.log(err);
@@ -47,7 +51,7 @@ const leaveRoomHandler = (socket, io) => (roomId) => {
         const room = leaveRoom(socket.id, Number(roomId));
         socket.leave(`${roomId}`);
 
-        io.emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
+        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
     } catch (err) {
         console.log(err);
     }
@@ -62,13 +66,13 @@ const disconnectHandler = (socket) => () => {
     }
 };
 
-const cardsChosenHandler = (socket, io) => (roomId, value) => {
+const cardsChosenHandler = (socket, io) => (roomId, card) => {
     try {
         const socketId = socket.id;
 
-        const room = updateCardValue(socketId, Number(roomId), value);
+        const room = updateCardValue(socketId, Number(roomId), card);
 
-        io.emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
+        io.in(`${roomId}`).emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
     } catch (err) {
         console.log(err);
     }
@@ -76,9 +80,12 @@ const cardsChosenHandler = (socket, io) => (roomId, value) => {
 
 const hideCardsHandler = (socket, io) => (roomId) => {
     try {
-        const room = toggleCardsVisibility(roomId, false);
+        toggleCardsVisibility(roomId, false);
+        toggleVoteStarted(roomId, true);
+        const room = updateAllCardsValue(roomId, { value: null, position: null });
 
-        io.emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
+        io.in(`${roomId}`).emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
+        io.in(`${roomId}`).emit(EVENT_SEND.VOTE_STATUS_UPDATE, room.voteStarted);
     } catch (err) {
         console.log(err);
     }
@@ -86,12 +93,19 @@ const hideCardsHandler = (socket, io) => (roomId) => {
 
 const showCardsHandler = (socket, io) => (roomId) => {
     try {
-        const room = toggleCardsVisibility(roomId, true);
+        toggleCardsVisibility(roomId, true);
+        const room = toggleVoteStarted(roomId, false);
 
-        io.emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
+        io.in(`${roomId}`).emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
+        io.in(`${roomId}`).emit(EVENT_SEND.VOTE_STATUS_UPDATE, room.voteStarted);
     } catch (err) {
         console.log(err);
     }
+};
+
+const pingHandler = (socket) => () => {
+    console.log('ping');
+    socket.emit('successful ping');
 };
 
 module.exports = {
@@ -102,4 +116,5 @@ module.exports = {
     cardsChosenHandler,
     hideCardsHandler,
     showCardsHandler,
+    pingHandler,
 };

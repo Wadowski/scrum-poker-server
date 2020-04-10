@@ -3,11 +3,11 @@ const ROLES = {
     PARTICIPANT: 'participant',
 };
 
-const Person = ({ socketId, name, roles, cardValue = 0 }) => ({
+const Person = ({ socketId, name, roles, card }) => ({
     socketId,
     name,
     roles,
-    cardValue,
+    card,
 });
 
 module.exports = {

@@ -6,6 +6,7 @@ const {
     cardsChosenHandler,
     hideCardsHandler,
     showCardsHandler,
+    pingHandler,
 } = require('../socketHandlers/roomManagement');
 const { EVENTS_RECEIVED } = require('../utils/constants');
 
@@ -18,6 +19,7 @@ const defaultNamespace = (io) => io
         socket.on(EVENTS_RECEIVED.CARD_CHOSEN, cardsChosenHandler(socket, io));
         socket.on(EVENTS_RECEIVED.HIDE_CARDS, hideCardsHandler(socket, io));
         socket.on(EVENTS_RECEIVED.SHOW_CARDS, showCardsHandler(socket, io));
+        socket.on(EVENTS_RECEIVED.PING, pingHandler(socket));
 });
 
 module.exports = {
