@@ -7,7 +7,7 @@ const EVENTS_RECEIVED = {
     CARD_CHOSEN: 'card chosen',
     HIDE_CARDS: 'hide cards',
     SHOW_CARDS: 'show cards',
-    PING: 'ping',
+    UPDATE_USER_DETAILS: 'update user details',
 };
 
 const EVENT_SEND = {
@@ -17,6 +17,7 @@ const EVENT_SEND = {
     CARDS_UPDATE: 'cards update',
     ROOM_UPDATE: 'room update',
     VOTE_STATUS_UPDATE: 'vote status update',
+    USER_DETAILS_UPDATE: 'user details update',
 };
 
 module.exports = {

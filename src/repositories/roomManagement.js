@@ -6,16 +6,22 @@ let rooms = [];
 let id = 1;
 
 const getRoomListIndex = (roomId) => {
-    const storedRoomId = rooms.findIndex(({ id }) => id === roomId);
+    const roomIdNum = Number(roomId);
+    const storedRoomId = rooms.findIndex(({ id }) => id === roomIdNum);
     if (storedRoomId === -1) throw new Error('Room not found');
 
     return storedRoomId;
 };
 
-const createRoom = (socketId, name) => {
+const getRoom = (roomId) => {
+    const storedRoomId = getRoomListIndex(roomId);
+
+    return rooms[storedRoomId];
+};
+
+const createRoom = (socketId) => {
     const person = Person({
         socketId,
-        name,
         roles: [
             ROLES.ADMIN,
             ROLES.PARTICIPANT,
@@ -34,11 +40,11 @@ const createRoom = (socketId, name) => {
     return room;
 };
 
-const joinRoom = (socketId, roomId, name) => {
+const joinRoom = (socketId, roomId) => {
     try {
         const storedRoomId = getRoomListIndex(roomId);
 
-        const person = Person({ socketId, name, roles: [ROLES.PARTICIPANT] });
+        const person = Person({ socketId, roles: [ROLES.PARTICIPANT] });
         rooms[storedRoomId].people.push(person);
 
         return rooms[storedRoomId];
@@ -101,6 +107,23 @@ const updateAllCardsValue = (roomId, card) => {
     return rooms[storedRoomId];
 };
 
+const updateUserDetails = (socketId, roomId, details) => {
+    const storedRoomId = getRoomListIndex(roomId);
+
+    let user = null;
+    rooms[storedRoomId].people.forEach((person) => {
+        if (person.socketId === socketId) {
+            person = {
+                ...person,
+                ...details,
+            };
+            user = person;
+        }
+    });
+
+    return user;
+};
+
 const toggleCardsVisibility = (roomId, visibilityStatus) => {
     const storedRoomId = getRoomListIndex(roomId);
 
@@ -118,12 +141,14 @@ const toggleVoteStarted = (roomId, voteStarted) => {
 };
 
 module.exports = {
+    getRoom,
     createRoom,
     removePersonFromRooms,
     joinRoom,
     leaveRoom,
     updateCardValue,
     updateAllCardsValue,
+    updateUserDetails,
     toggleCardsVisibility,
     toggleVoteStarted,
 };

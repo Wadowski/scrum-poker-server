@@ -3,7 +3,7 @@ const ROLES = {
     PARTICIPANT: 'participant',
 };
 
-const Person = ({ socketId, name, roles, card }) => ({
+const Person = ({ socketId, name = null, roles, card }) => ({
     socketId,
     name,
     roles,

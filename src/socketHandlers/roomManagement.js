@@ -1,4 +1,5 @@
 const {
+    getRoom,
     createRoom,
     joinRoom,
     leaveRoom,
@@ -7,6 +8,7 @@ const {
     updateAllCardsValue,
     toggleCardsVisibility,
     toggleVoteStarted,
+    updateUserDetails,
 } = require('../repositories/roomManagement');
 const { EVENT_SEND } = require('../utils/constants');
 
@@ -17,10 +19,11 @@ const mapRoom = (room) => ({
     })),
 });
 
-const createRoomHandler = (socket, io) => (name) => {
+const createRoomHandler = (socket, io) => () => {
     try {
-        const room = createRoom(socket.id, name);
+        const room = createRoom(socket.id);
         socket.join(`${room.id}`);
+
         socket.emit(EVENT_SEND.ROOM_JOINED, room.id );
         io.in(`${room.id}`).emit(EVENT_SEND.ROOM_UPDATE, room);
         io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
@@ -30,10 +33,10 @@ const createRoomHandler = (socket, io) => (name) => {
     }
 };
 
-const joinRoomHandler = (socket, io) => (roomId, name) => {
+const joinRoomHandler = (socket, io) => (roomId) => {
     try {
 
-        const room = joinRoom(socket.id, Number(roomId), name);
+        const room = joinRoom(socket.id, Number(roomId));
         socket.join(`${roomId}`);
 
         socket.emit(EVENT_SEND.ROOM_JOINED, roomId);
@@ -47,7 +50,6 @@ const joinRoomHandler = (socket, io) => (roomId, name) => {
 
 const leaveRoomHandler = (socket, io) => (roomId) => {
     try {
-
         const room = leaveRoom(socket.id, Number(roomId));
         socket.leave(`${roomId}`);
 
@@ -103,9 +105,16 @@ const showCardsHandler = (socket, io) => (roomId) => {
     }
 };
 
-const pingHandler = (socket) => () => {
-    console.log('ping');
-    socket.emit('successful ping');
+const updateUserDetailsHandler = (socket, io) => (roomId, userDetails) => {
+    try {
+        console.log(({roomId, userDetails}));
+        const user = updateUserDetails(socket.id, roomId, userDetails);
+
+        socket.emit(EVENT_SEND.USER_DETAILS_UPDATE, user);
+        io.in(`${roomId}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(getRoom(roomId)).people);
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 module.exports = {
@@ -116,5 +125,5 @@ module.exports = {
     cardsChosenHandler,
     hideCardsHandler,
     showCardsHandler,
-    pingHandler,
+    updateUserDetailsHandler,
 };
