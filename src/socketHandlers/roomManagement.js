@@ -74,6 +74,16 @@ const cardsChosenHandler = (socket, io) => (roomId, card) => {
 
         const room = updateCardValue(socketId, Number(roomId), card);
 
+        const notDecidedPerson = room.people.find(({ card }) =>
+            card === undefined || card.value === null
+        );
+
+        if (notDecidedPerson === undefined) {
+            toggleCardsVisibility(roomId, true);
+            toggleVoteStarted(roomId, false);
+            io.in(`${roomId}`).emit(EVENT_SEND.VOTE_STATUS_UPDATE, room.voteStarted);
+        }
+
         io.in(`${roomId}`).emit(EVENT_SEND.CARDS_UPDATE, mapRoom(room).people);
     } catch (err) {
         console.log(err);
