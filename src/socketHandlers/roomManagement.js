@@ -4,6 +4,7 @@ const {
     joinRoom,
     leaveRoom,
     removePersonFromRooms,
+    isPersonInRoom,
     updateCardValue,
     updateAllCardsValue,
     toggleCardsVisibility,
@@ -35,13 +36,15 @@ const createRoomHandler = (socket, io) => () => {
 
 const joinRoomHandler = (socket, io) => (roomId) => {
     try {
+        if (!isPersonInRoom(socket.id, Number(roomId))) {
+            const room = joinRoom(socket.id, Number(roomId));
 
-        const room = joinRoom(socket.id, Number(roomId));
-        socket.join(`${roomId}`);
+            socket.join(`${roomId}`);
+            socket.emit(EVENT_SEND.ROOM_JOINED, roomId);
 
-        socket.emit(EVENT_SEND.ROOM_JOINED, roomId);
-        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_UPDATE, room);
-        io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
+            io.in(`${room.id}`).emit(EVENT_SEND.ROOM_UPDATE, room);
+            io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
+        }
     } catch (err) {
         socket.emit(EVENT_SEND.ROOM_NOT_JOINED);
         console.log(err);

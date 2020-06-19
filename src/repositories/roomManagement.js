@@ -79,6 +79,15 @@ const removePersonFromRooms = (socketId) => {
     return roomsJoined;
 };
 
+const isPersonInRoom = (socketId, roomId) => {
+    const storedRoomId = getRoomListIndex(roomId);
+
+    const person = rooms[storedRoomId].people
+        .find(({ socketId: storedSocketId }) => storedSocketId === socketId);
+
+    return !!person;
+};
+
 const updateCardValue = (socketId, roomId, card) => {
     const storedRoomId = getRoomListIndex(roomId);
 
@@ -144,6 +153,7 @@ module.exports = {
     removePersonFromRooms,
     joinRoom,
     leaveRoom,
+    isPersonInRoom,
     updateCardValue,
     updateAllCardsValue,
     updateUserDetails,
