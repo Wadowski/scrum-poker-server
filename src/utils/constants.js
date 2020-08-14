@@ -8,6 +8,7 @@ const EVENTS_RECEIVED = {
     HIDE_CARDS: 'hide cards',
     SHOW_CARDS: 'show cards',
     UPDATE_USER_DETAILS: 'update user details',
+    UPDATE_ROOM_OWNER: 'update room owner',
     TEST: 'test',
 };
 

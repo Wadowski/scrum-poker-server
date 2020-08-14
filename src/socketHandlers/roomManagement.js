@@ -10,6 +10,7 @@ const {
     toggleCardsVisibility,
     toggleVoteStarted,
     updateUserDetails,
+    setRoomOwner,
 } = require('../repositories/roomManagement');
 const { EVENT_SEND } = require('../utils/constants');
 
@@ -129,6 +130,18 @@ const updateUserDetailsHandler = (socket, io) => (roomId, userDetails) => {
     }
 };
 
+const updateRoomOwnerHandler = (socket, io) => (roomId, socketId) => {
+    try {
+        const { newOwner, oldOwner } = setRoomOwner(roomId, socketId);
+
+        socket.emit(EVENT_SEND.USER_DETAILS_UPDATE, oldOwner);
+        io.to(`${newOwner.socketId}`).emit(EVENT_SEND.USER_DETAILS_UPDATE, newOwner);
+        io.in(`${roomId}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(getRoom(roomId)).people);
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 const pingHandler = (socket) => () => {
     socket.emit(EVENT_SEND.TEST);
 };
@@ -142,5 +155,6 @@ module.exports = {
     hideCardsHandler,
     showCardsHandler,
     updateUserDetailsHandler,
+    updateRoomOwnerHandler,
     pingHandler,
 };

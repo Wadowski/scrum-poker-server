@@ -7,6 +7,7 @@ const {
     hideCardsHandler,
     showCardsHandler,
     updateUserDetailsHandler,
+    updateRoomOwnerHandler,
     pingHandler,
 } = require('../socketHandlers/roomManagement');
 const { EVENTS_RECEIVED } = require('../utils/constants');
@@ -21,6 +22,7 @@ const defaultNamespace = (io) => io
         socket.on(EVENTS_RECEIVED.HIDE_CARDS, hideCardsHandler(socket, io));
         socket.on(EVENTS_RECEIVED.SHOW_CARDS, showCardsHandler(socket, io));
         socket.on(EVENTS_RECEIVED.UPDATE_USER_DETAILS, updateUserDetailsHandler(socket, io));
+        socket.on(EVENTS_RECEIVED.UPDATE_ROOM_OWNER, updateRoomOwnerHandler(socket, io));
         socket.on(EVENTS_RECEIVED.TEST, pingHandler(socket));
 });
 

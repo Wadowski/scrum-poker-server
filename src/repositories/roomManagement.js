@@ -147,6 +147,31 @@ const toggleVoteStarted = (roomId, voteStarted) => {
     return rooms[storedRoomId];
 };
 
+const setRoomOwner = (roomId, socketId) => {
+    const storedRoomId = getRoomListIndex(roomId);
+
+    let newOwner = null;
+    let oldOwner = null;
+    rooms[storedRoomId].people.forEach((person) => {
+        if (person.roles.includes(ROLES.ADMIN)) {
+            person.roles = person.roles.filter((role) => role !== ROLES.ADMIN);
+            oldOwner = person;
+        }
+        if (person.socketId === socketId) {
+            person.roles = [
+                ...person.roles,
+                ROLES.ADMIN,
+            ];
+            newOwner = person;
+        }
+    });
+
+    return {
+        oldOwner,
+        newOwner,
+    };
+};
+
 module.exports = {
     getRoom,
     createRoom,
@@ -159,4 +184,5 @@ module.exports = {
     updateUserDetails,
     toggleCardsVisibility,
     toggleVoteStarted,
+    setRoomOwner,
 };
