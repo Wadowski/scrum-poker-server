@@ -55,8 +55,10 @@ const joinRoomHandler = (socket, io) => (roomId) => {
 const leaveRoomHandler = (socket, io) => (roomId) => {
     try {
         const room = leaveRoom(socket.id, Number(roomId));
+        const { newOwner } = setRoomOwner(roomId, room.people[0].socketId);
         socket.leave(`${roomId}`);
 
+        io.to(`${newOwner.socketId}`).emit(EVENT_SEND.USER_DETAILS_UPDATE, newOwner);
         io.in(`${room.id}`).emit(EVENT_SEND.ROOM_PEOPLE_UPDATE, mapRoom(room).people);
     } catch (err) {
         console.log(err);
